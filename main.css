@@ -6,3 +6,8 @@
 .highlight{
     background-color: coral!important;
 }
+
+#history span:nth-child(2):after { 
+     content: "\A";
+     white-space: pre; 
+}
