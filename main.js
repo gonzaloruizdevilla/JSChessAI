@@ -27,10 +27,10 @@ let onSnapEnd = (...args) => {  }
 let config = {
     draggable: true,
     position: 'start',
-    onDragStart,
-    onDrop,
     onMouseoutSquare,
     onMouseoverSquare,
+    onDragStart,
+    onDrop,
     onSnapEnd
 }
 
