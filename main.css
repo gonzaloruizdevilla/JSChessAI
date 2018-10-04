@@ -4,10 +4,17 @@
 }
 
 .highlight{
-    background-color: coral!important;
+    background-color: yellowgreen!important;
+    transition: background-color 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-#history span:nth-child(2):after { 
-     content: "\A";
-     white-space: pre; 
+#history {
+    display: flex;
+    flex-wrap: wrap;
+    margin: auto;
+    width: 200px;
+}
+#history span {
+    flex: 0 0 40%;
+
 }
