@@ -25,20 +25,53 @@ let renderHistory = () => document.getElementById("history").innerHTML = `
     `).join('')}
 `;
 
-let findBestMove = () => {
+let findBestMoveRandom = () => {
     if (game.game_over()) return alert('Game over!');
     let moves = game.moves();
-    return moves[0|Math.random()*moves.length]
+    return moves[0 | Math.random() * moves.length]
+}
+
+let getPieceValue = ({type, color}) => ({
+        k: 900,
+        q: 90,
+        r: 50,
+        b: 30,
+        n: 30,
+        p: 10
+    }[type] * {w:-1,b:1}[color]);
+
+let getBoardValue = (board) => {
+    return board.reduce(
+        (acc, row) => row.reduce((racc, piece) => piece ? racc + getPieceValue(piece) : racc, acc)
+        ,0);
+
+}
+
+let getBestMove = () => {
+    let bestValue = -99999;
+    let bestMove = null;
+    for(let move of game.moves()){
+        game.move(move);
+        let value = getBoardValue(game.board())
+        game.undo()
+        if (value > bestValue) {
+            bestValue = value
+            bestMove = move
+        }
+    }
+    return bestMove;
+}
+
+let findBestMove = () => {
+    if (game.game_over()) return alert('Game over!');
+    return getBestMove()
 }
 
 let makeBestMove = () => {
     let bestMove = findBestMove();
-    if (bestMove) {
-        game.move(bestMove);
-        board.position(game.fen())
-        renderHistory();
-        if (game.game_over()) alert('Game over!');
-    }
+    game.move(bestMove);
+    board.position(game.fen())
+    renderHistory();
 
 }
 
@@ -47,7 +80,7 @@ let onDrop = (from, to) => {
     var move = game.move({from, to, promotion:'q'});
     if (!move) return 'snapback';
     renderHistory();
-    window.setTimeout(makeBestMove, 500);
+    window.setTimeout(makeBestMove, 250);
 
 }
 let onSnapEnd = () => {
