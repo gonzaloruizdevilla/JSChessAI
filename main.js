@@ -47,7 +47,7 @@ let getBoardValue = (board) => {
 
 }
 
-let getBestMove = () => {
+let getBestMoveBasic = () => {
     let bestValue = -99999;
     let bestMove = null;
     for(let move of game.moves()){
@@ -61,6 +61,34 @@ let getBestMove = () => {
     }
     return bestMove;
 }
+
+let minimax = (depth, game, maximising) => {
+    if (depth == 0) return getBoardValue(game.board());
+    var fn = maximising ? Math.max : Math.min;
+    var val = maximising ? -9999 : 9999;
+    for(let move of game.moves()) {
+        game.move(move);
+        val = fn(val, minimax(depth-1, game, !maximising));
+        game.undo()
+    }
+    return val;
+}
+
+let getBestMove = () => {
+    let bestValue = -99999;
+    let bestMove = null;
+    for(let move of game.moves()){
+        game.move(move);
+        let value = minimax(1, game, false);
+        game.undo()
+        if (value > bestValue) {
+            bestValue = value
+            bestMove = move
+        }
+    }
+    return bestMove;
+}
+
 
 let findBestMove = () => {
     if (game.game_over()) return alert('Game over!');
