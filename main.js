@@ -77,15 +77,17 @@ let minimax = (depth, game, maximising) => {
 let getBestMove = () => {
     let bestValue = -99999;
     let bestMove = null;
+    let time = new Date();
     for(let move of game.moves()){
         game.move(move);
-        let value = minimax(1, game, false);
+        let value = minimax(+document.getElementById("depth").value, game, false);
         game.undo()
         if (value > bestValue) {
             bestValue = value
             bestMove = move
         }
     }
+    document.getElementById("time").innerHTML = (new Date() - time) + "ms"
     return bestMove;
 }
 
