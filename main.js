@@ -77,7 +77,7 @@ let minimax = (depth, game, maximising) => {
     return val;
 }
 
-let getBestMove = () => {
+let getBestMoveMinimax = () => {
     let bestValue = -Infinity;
     let bestMove = null;
     let time = new Date();
@@ -90,13 +90,50 @@ let getBestMove = () => {
             bestMove = move
         }
     }
-    document.getElementById("time").innerHTML = (new Date() - time) + "ms"
     let timediff = (new Date() - time) + "ms"
     document.getElementById("time").innerHTML = timediff + "ms"
     document.getElementById("positions").innerHTML =  positionCnt
     document.getElementById("positions_s").innerHTML = (1000 * positionCnt)/timediff
     return bestMove;
 }
+
+
+let minimax_ab = (depth, game, alpha, beta, maximising) => {
+    positionCnt++;
+    if (depth == 0) return getBoardValue(game.board());
+    var fn = maximising ? Math.max : Math.min;
+    var val = maximising ? -Infinity : Infinity;
+    var update =  maximising ? best => alpha = fn(alpha, best)
+                             : best => beta = fn(beta, best);
+    for(let move of game.moves()) {
+        game.move(move);
+        val = fn(val, minimax_ab(depth-1, game, alpha, beta, !maximising));
+        game.undo()
+        update(val)
+        if (beta <= alpha) return val;
+    }
+    return val;
+}
+
+let getBestMove = () => {
+    let bestValue = -Infinity;
+    let bestMove = null;
+    let time = new Date();
+    positionCnt = 0;
+    for(let move of game.moves()){
+        game.move(move);
+        let value = minimax_ab(+document.getElementById("depth").value - 1, game, -Infinity, Infinity, false);
+        game.undo()
+        if (value > bestValue) {
+            bestValue = value
+            bestMove = move
+        }
+    }
+    let timediff = (new Date() - time) + "ms"
+    document.getElementById("time").innerHTML = timediff + "ms"
+    document.getElementById("positions").innerHTML =  positionCnt
+    document.getElementById("positions_s").innerHTML =  (1000 * positionCnt)/timediff
+    
     return bestMove;
 }
 
