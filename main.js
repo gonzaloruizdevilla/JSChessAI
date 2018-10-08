@@ -1,6 +1,8 @@
 let board,
     game = new Chess();
 
+let positionCnt = 0;
+
 let onDragStart = 
     (square, piece) =>
         !(game.in_checkmate() || game.in_draw() || /^b/.test(piece))
@@ -63,6 +65,7 @@ let getBestMoveBasic = () => {
 }
 
 let minimax = (depth, game, maximising) => {
+    positionCnt++;
     if (depth == 0) return getBoardValue(game.board());
     var fn = maximising ? Math.max : Math.min;
     var val = maximising ? -Infinity : Infinity;
@@ -88,6 +91,12 @@ let getBestMove = () => {
         }
     }
     document.getElementById("time").innerHTML = (new Date() - time) + "ms"
+    let timediff = (new Date() - time) + "ms"
+    document.getElementById("time").innerHTML = timediff + "ms"
+    document.getElementById("positions").innerHTML =  positionCnt
+    document.getElementById("positions_s").innerHTML = (1000 * positionCnt)/timediff
+    return bestMove;
+}
     return bestMove;
 }
 
