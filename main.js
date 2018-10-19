@@ -115,7 +115,7 @@ let minimax_ab = (depth, game, alpha, beta, maximising) => {
     return val;
 }
 
-let getBestMove = () => {
+let getBestMoveAlfaBeta = () => {
     let bestValue = -Infinity;
     let bestMove = null;
     let time = new Date();
@@ -137,6 +137,29 @@ let getBestMove = () => {
     return bestMove;
 }
 
+let model;
+async function loadModel(){
+    model = await tf.loadModel("http://127.0.0.1:8081/models/chess-model-1.json");
+    const optimizer = tf.train.sgd(0.01);
+    model.compile({
+        optimizer: optimizer,
+        loss: 'categoricalCrossentropy',
+        metrics: ['accuracy']
+    });
+}
+loadModel()
+
+async function getBestMove() {
+    let validMoves = game.moves();
+    let state = getBoardState(game.fen());
+    const xs = tf.tensor4d(state, [1, 8, 8, 8]);
+    let prediction = model.predict(xs);
+    let data = await prediction.data();
+    data = data.map((v,idx) => validMoves.indexOf(labels[idx]) == -1 ? 0 : v);
+    let idx = await tf.argMax(data).data();
+    return labels[idx];
+
+}
 
 let findBestMove = () => {
     if (game.game_over()) return alert('Game over!');
@@ -144,11 +167,11 @@ let findBestMove = () => {
 }
 
 let makeBestMove = () => {
-    let bestMove = findBestMove();
-    game.move(bestMove);
-    board.position(game.fen())
-    renderHistory();
-
+    findBestMove().then(bestMove => {
+        game.move(bestMove);
+        board.position(game.fen())
+        renderHistory();
+    })
 }
 
 let onDrop = (from, to) => {
